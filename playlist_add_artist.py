@@ -18,7 +18,9 @@ def select_playlists(sp, username):
         print("    1: add playlists")
         print("    2: add all user playlists")
         print("    3: remove playlists")
-        print("    4: list playlists")
+        print("    4: remove all playlists")
+        print("    5: list playlists without details")
+        print("    6: list playlists with details")
         print()
         choice = input("  Select an option: ")
 
@@ -35,30 +37,38 @@ def select_playlists(sp, username):
                     try:
                         search_results = sp.search(playlist,1,0,"playlist")
                         playlist = search_results['playlists']['items'][0]
-                        print("         name: " + playlist['name'])
-                        print("      made by: " + playlist['owner']['display_name'])
+                        print("       name: " + playlist['name'])
+                        print("      owner: " + playlist['owner']['display_name'])
                     except:
                         print("      ERROR: playlist not valid")
                         continue
-                    playlists.append(playlist)
-                    playlist_ids.append(playlist['id'])
-                    playlist_names.append(playlist['name'])
+                    if not(playlist['id'] in playlist_ids):
+                        playlists.append(playlist)
+                        playlist_ids.append(playlist['id'])
+                        playlist_names.append(playlist['name'])
+                    else:
+                        print()
+                        print("      ERROR: playlist already added")
+                        continue
                 else:
                     break
 
         # add all playlists
         elif choice=='2':
+            print("    All playlists added")
             all_playlists = (sp.current_user_playlists())
-            playlist_ids = []
             for playlist in all_playlists['items']:
-                playlists.append(playlist)
-                playlist_ids.append(playlist['id'])
-                playlist_names.append(playlist['name'])
+                if not(playlist['id'] in playlist_ids):
+                    playlists.append(playlist)
+                    playlist_ids.append(playlist['id'])
+                    playlist_names.append(playlist['name'])
+                else:
+                    continue
 
         # remove playlists
         elif choice=='3':
             while True:
-                i = 0
+                i = 1
                 print()
                 print("    Current playlists:")
                 for playlist_name in playlist_names:
@@ -68,25 +78,47 @@ def select_playlists(sp, username):
                 index = input(("      Enter playlist # or RETURN to stop removing: "))
                 if not(len(list(index))):
                     break
-                index = int(index)
-                if index in range(0,len(playlist_names)):
+                try:
+                    index = int(index)-1
+                except:
+                    print("        ERROR: index not valid")
+                    continue
+                if (index) in range(0,len(playlist_names)):
                     playlists.remove(playlists[index])
                     playlist_names.remove(playlist_names[index])
                     playlist_ids.remove(playlist_ids[index])
                 else:
                     print("        ERROR: index not in range")
                     continue
+        # remove all playlists
+        elif choice=='4':
+            playlists = []
+            playlist_ids = []
+            playlist_names = []
+            print("    All playlists removed")
+
+        # list all playlists without details
+        elif choice=='5':
+            i = 1
+            print()
+            print("    Current playlists:")
+            for  playlist in playlists:
+                print("      " + str(i) + ": " + playlist['name'])
+                i+=1
 
         # list all playlists with details
-        elif choice=='4':
+        elif choice=='6':
+            i = 1
             print()
+            print("    Current playlists:")
             for playlist in playlists:
-                print("    " + playlist['name'])
-                print("                 owner: " + playlist['owner']['display_name'])
-                print("           description: " + playlist['description'])
-                print("      number of tracks: " + str(playlist['tracks']['total']))
-                print("                  link: " + playlist['external_urls']['spotify'])
+                print("      " + str(i) + ": " + playlist['name'])
+                print("                       owner: " + playlist['owner']['display_name'])
+                print("                 description: " + playlist['description'])
+                print("            number of tracks: " + str(playlist['tracks']['total']))
+                print("                        link: " + playlist['external_urls']['spotify'])
                 print()
+                i+=1
 
         # user input invalid
         else:
@@ -107,7 +139,9 @@ def select_artists(sp, username):
         print("    0: finished selection")
         print("    1: add artists")
         print("    2: remove artists")
-        print("    3: list artists")
+        print("    3: remove all artists")
+        print("    4: list artists without details")
+        print("    5: list artists with details")
         print()
         choice = input("    Select an option: ")
 
@@ -129,16 +163,21 @@ def select_artists(sp, username):
                     except:
                         print("      ERROR: artist not valid")
                         continue
-                    artists.append(artist)
-                    artist_ids.append(artist['id'])
-                    artist_names.append(artist['name'])
+                    if not(artist['id'] in artist_ids):
+                        artists.append(artist)
+                        artist_ids.append(artist['id'])
+                        artist_names.append(artist['name'])
+                    else:
+                        print()
+                        print("      ERROR: artist already added")
+                        continue
                 else:
                     break
 
         # remove artists
         elif choice=='2':
             while True:
-                i = 0
+                i = 1
                 print()
                 print("    Current artists:")
                 for artist_name in artist_names:
@@ -148,25 +187,48 @@ def select_artists(sp, username):
                 index = input(("      Enter artist # or RETURN to stop removing: "))
                 if not(len(list(index))):
                     break
-                index = int(index)
+                try:
+                    index = int(index)-1
+                except:
+                    print("        ERROR: index not valid")
+                    continue
                 if index in range(0,len(artist_names)):
                     artists.remove(artists[index])
                     artist_names.remove(artist_names[index])
                     artist_ids.remove(artist_ids[index])
                 else:
-                    print("      ERROR: index not in range")
+                    print("        ERROR: index not in range")
                     continue
 
-        # list all artists with details
+        # remove all artists
         elif choice=='3':
+            artists = []
+            artist_names = []
+            artist_ids = []
+            print("      All artists removed")
+
+        # list all artists without details
+        elif choice=='4':
+            i = 1
             print()
+            print("    Current artists:")
+            for  artist in artists:
+                print("      " + str(i) + ": " + artist['name'])
+                i+=1
+
+        # list all artists with details
+        elif choice=='5':
+            i = 1
+            print()
+            print("    Current artists:")
             for artist in artists:
-                print("    " + artist['name'])
-                print("            genre: " + str(artist['genres']))
-                print("        followers: " + str(artist['followers']['total']))
-                print("       popularity: " + str(artist['popularity']))
-                print("             link: " + artist['external_urls']['spotify'])
+                print("      " + str(i) + ": " + artist['name'])
+                print("                  genre: " + str(artist['genres']))
+                print("              followers: " + str(artist['followers']['total']))
+                print("             popularity: " + str(artist['popularity']))
+                print("                   link: " + artist['external_urls']['spotify'])
                 print()
+                i+=1
 
         # user input invalid
         else:
@@ -201,14 +263,12 @@ def duplicate_track(track, names):
 
 # add songs to playlist
 def add_songs(username, playlist_id, track_ids):
-    error = 0
     try:
         for id in track_ids:
             sp.user_playlist_add_tracks(username, playlist_id, [id])
     except:
-        print("unable to add songs")
-        error = 1
-    return error
+        return  1
+    return 0
 
 # get token
 print()
@@ -235,23 +295,28 @@ while True:
     except:
         playlist_id = []
         print("    ERROR: playlist not valid")
+        print()
         continue
+    print("                name: " + playlist['name'])
+    print("               owner: " + playlist['owner']['display_name'])
+    print("         description: " + playlist['description'])
+    print("    number of tracks: " + str(playlist['tracks']['total']))
+    print("                link: " + playlist['external_urls']['spotify'])
     print()
-    print("  Do you want to modify this  playlist?")
-    print("              name: " + playlist['name'])
-    print("             owner: " + playlist['owner']['display_name'])
-    print("       description: " + playlist['description'])
-    print("  number of tracks: " + str(playlist['tracks']['total']))
-    print("              link: " + playlist['external_urls']['spotify'])
-    print()
-    if input("  y/n: ")=='y':
+    if input("  Do you want to modify this playlist? y/n: ")=='y':
         break
     new_text = "new "
     print()
 
 # get minimum number of tracks for each artist
-print()
-min_tracks = int(input("Enter the minimum number of tracks from each artist: "))
+while True:
+    print()
+    try:
+        min_tracks = int(input("Enter the minimum number of tracks from each artist: "))
+    except:
+        print("  ERROR: input invalid")
+        continue
+    break
 
 # select playlists to add from
 source_playlists = select_playlists(sp, username)
